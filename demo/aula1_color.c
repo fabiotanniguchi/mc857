@@ -1,52 +1,55 @@
 #include "FL.h"
 
 int main(int argc, char **argv) {
+    //color image
+    ColorImage *colorImage = ReadColorImage("../data/squares.ppm");
+    int depth = colorImage->Imax + 1;
+    int block = 4;
+    int blocks = block * block * block;
+    int l1;
+    int l2;
+    int l3;
+    //int *h = (int *) calloc(blocks, sizeof(int));
+    //printf("TESTE3\n");
+    float h[blocks];
+    //printf("TESTE4\n");
+    int block_size = depth / block;
 
-    float h[256][3];
-    int k;
-    for(k = 0; k < 256; k++){
-        h[k][0] = 0;
-        h[k][1] = 0;
-        h[k][2] = 0;
+    for(int k = 0; k < blocks; k++){
+        h[k] = 0;
     }
 
-    //color image
-    ColorImage *colorImage = ReadColorImage("../data/lenaColor.ppm");
-
-    double ka = (2^(colorImage->ny * colorImage->nx))/4;
-
-    for (int i = 0; i < colorImage->ny; ++i) {
-        for (int j = 0; j < colorImage->nx; ++j) {
-/*
-            colorImage->cor[i][j].val[0] = 255 - colorImage->cor[i][j].val[0];
-            colorImage->cor[i][j].val[1] = 255 - colorImage->cor[i][j].val[1];
-            colorImage->cor[i][j].val[2] = 255 - colorImage->cor[i][j].val[2];
-*/
-            index = (i*colorImage->ny) + j;
-
-	    int l1 = (colorImage->cor[i][j].val[0])/ka;
-	    int l2 = (colorImage->cor[i][j].val[1])/ka;
-	    int l3 = (colorImage->cor[i][j].val[2])/ka;
-
-	    h[colorImage->cor[i][j].val[0]][0] = h[colorImage->cor[i][j].val[0]][0] + 1;
-	    h[colorImage->cor[i][j].val[1]][1] = h[colorImage->cor[i][j].val[1]][1] + 1;
-	    h[colorImage->cor[i][j].val[2]][2] = h[colorImage->cor[i][j].val[2]][2] + 1;
+    for (int i = 0; i < colorImage->ny; i++) {
+        for (int j = 0; j < colorImage->nx; j++) {
+            // red
+            l1 = colorImage->cor[i][j].val[0];
+            // green
+            l2 = colorImage->cor[i][j].val[1];
+            // blue
+            l3 = colorImage->cor[i][j].val[2];
+            //printf("l1 = %d block_size = %d depth = %d block = %d, blocks = %d\n", l1, block_size, depth, block, blocks);
+            int red = l1 / block_size;
+            int green = l2 / block_size;
+            int blue = l3 / block_size;
+            //printf("red = %d green = %d blue = %d\n", l1, l2, l3);
+            //printf("TESTE5\n");
+            int index = red + (green * block) + (blue * block * block);
+            //printf("TESTE6 index = %d\n", index);
+            h[index] += 1;
+            //printf("TESTE7\n");
         }
     }
 
-    for(k = 0; k < 256; k++){
-       h[k][0] = h[k]/(colorImage->nrows * colorImage->ncols);
-       h[k][1] = h[k]/(colorImage->nrows * colorImage->ncols);
-       h[k][2] = h[k]/(colorImage->nrows * colorImage->ncols);
+    for(int k = 0; k < blocks; k++){
+       h[k] = h[k]/(colorImage->ny * colorImage->nx);
     }
 
     FILE *fp;
     fp = fopen("h.txt", "w");
-    for(k = 0; k < 255; k++){
-	    fprintf(fp, "%d %d %d %d %f\n", k, h[k]);
+    for(int k = 0; k < blocks; k++){
+	    fprintf(fp, "%d %f\n", k, h[k]);
     }
     fclose(fp);
 
     return 0;
 }
-
