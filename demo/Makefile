@@ -1,7 +1,9 @@
 BIN=.
+CC = g++
 
 #FLAGS= -g -O0 -Wall -Wno-unused-result -std=gnu99 -pedantic
-FLAGS= -O3  -Wall -Wno-unused-result -std=gnu99 -pedantic
+FLAGS= -O3  -Wall -Wno-unused-result  -pedantic -fopenmp -Wno-write-strings -fsanitize=address
+#-std=gnu99
 FLLIB    = -L../lib -lFL -lm
 FLFLAGS  = -I../include
 
@@ -9,17 +11,16 @@ libift:
 	cd ../; $(MAKE) ; cd -\
 
 
-$@.c: libft $@.c
+$@.cpp: libft $@.cpp
 	make
-	$(CC) $(FLAGS) $@.c -o $(BIN)/$@ $(FLFLAGS) $(FLLIB) ; \
+	$(CC) $(FLAGS) $@.cpp -o $(BIN)/$@ $(FLFLAGS) $(FLLIB) ; \
 
+#Removing everything without an extension
 clean:	
-	rm rwImage
+	find . -type f -executable -exec rm '{}' \;
 
+cleanImages:
+	rm *.ppm *.pgm *.gif
 
-
-
-
-
-
-
+cleanText:
+	rm *.txt

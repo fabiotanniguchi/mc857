@@ -100,3 +100,5 @@ else:
     g = inputData[2, :]
     b = inputData[3, :]
     plotColorHistogram(x,r,g,b,split)
+
+
